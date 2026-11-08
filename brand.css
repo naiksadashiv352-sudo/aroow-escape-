@@ -56,3 +56,29 @@ body[data-theme=dark] #tm{background:#087f5b!important}
 .pill{border-radius:999px;background:var(--soft);color:var(--brand);font-size:11px;font-weight:800;padding:5px 9px}
 #pause-game{position:fixed;right:max(16px,calc((100vw - 560px)/2));top:64px;z-index:12;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;padding:8px 11px;font-weight:800;box-shadow:var(--shadow)}
 @media(max-width:420px){.level-grid{grid-template-columns:repeat(7,minmax(0,1fr))}.platform-grid{gap:8px}.platform-tile{padding:11px}}
+
+/* Mobile header/account/gameplay layout refinement */
+header{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand menu" "level stats";align-items:center;gap:8px 10px!important;width:100%!important;max-width:560px!important;margin:0 auto;padding:10px 4px!important}
+header .brandbar{grid-area:brand;min-width:0}
+header #menu{grid-area:menu;justify-self:end;white-space:nowrap;padding:8px 12px!important;font-size:14px!important}
+header>span:nth-of-type(1){grid-area:level;justify-self:start;min-width:0;font-size:13px}
+header>span:nth-of-type(2){grid-area:stats;justify-self:end;white-space:nowrap;font-size:13px}
+.brandname{font-size:14px!important;white-space:nowrap}
+.brandname small{font-size:8px!important;letter-spacing:1.5px!important}
+#firebase-account{max-width:560px!important;margin:2px auto 10px!important;padding:7px 9px!important;min-height:40px!important;flex-wrap:nowrap!important;overflow:hidden}
+#firebase-account-status{font-size:10px!important;line-height:1.25!important;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+#firebase-account>span{flex:0 0 auto}
+#firebase-account button{font-size:11px!important;padding:6px 8px!important;white-space:nowrap}
+#board{width:min(92vw,520px,calc(100svh - 390px))!important;max-width:520px!important;flex:0 0 auto}
+footer{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin:12px auto 12px!important}
+#pause-game{position:static!important;z-index:auto!important;padding:12px 16px!important;font-size:14px!important}
+#platform-nav{display:flex!important}
+@media(max-width:420px){
+ header{gap:6px 8px!important}
+ .brandmark{width:32px!important;height:32px!important;flex-basis:32px!important}
+ .brandname{font-size:13px!important}
+ #board{width:min(92vw,calc(100svh - 370px))!important}
+ #firebase-account{gap:5px!important}
+ #firebase-account button{font-size:10px!important;padding:6px!important}
+ footer .btn{padding:11px 13px!important;font-size:14px!important}
+}
