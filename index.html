@@ -84,6 +84,16 @@ body{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))!important}
  footer .btn{padding:10px 12px!important;font-size:13px!important}
 }
 
+
+/* Fit all gameplay actions on one row on compact phones */
+footer{width:100%;max-width:560px;box-sizing:border-box;display:flex;flex-direction:row;flex-wrap:nowrap;justify-content:center;align-items:center;gap:6px;padding:0 4px}
+footer #hint,footer #restart,footer #pause-game{flex:1 1 0;min-width:0;max-width:150px;box-sizing:border-box;padding:9px 5px!important;font-size:clamp(11px,3.2vw,14px)!important;white-space:nowrap}
+#pause-game{margin:0!important}
+#firebase-account{box-sizing:border-box!important;width:100%!important;max-width:560px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:6px!important;overflow:visible!important}
+#firebase-account-status{white-space:normal!important;overflow-wrap:anywhere!important;font-size:11px!important}
+#firebase-account>span:last-child{display:flex!important;flex-wrap:wrap!important;gap:6px!important;min-width:0!important}
+#firebase-account button{max-width:100%!important;white-space:nowrap!important}
+
 </style>
 </head>
 <body>
