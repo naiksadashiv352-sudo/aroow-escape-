@@ -71,6 +71,7 @@ async function restoreProgress() {
   localStorage.setItem("arrowEscape", JSON.stringify(merged));
   if (window.S) Object.assign(window.S, merged);
   window.dispatchEvent(new CustomEvent("arrowescape:cloud-restored", { detail: merged }));
+  await publishScore(merged).catch(error => console.warn("Leaderboard restore publish:", error));
   return true;
 }
 
