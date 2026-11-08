@@ -217,7 +217,7 @@ function useHint(){
   if(a){S.hints--;save();hud();a.el.classList.add('hint');setTimeout(()=>a.el.classList.remove('hint'),1600)}
 }
 function ad(cb){
-  if(!ADS.client||typeof adBreak!=='function')return demoAd(cb);
+  if(!ADS.client||typeof adBreak!=='function')return demoAd();
   let viewed=false;
   adBreak({type:'reward',name:'reward',
     beforeReward:showAd=>showAd(),
@@ -236,9 +236,8 @@ function nextLevel(){
 function dbl(g){
   ad(()=>{S.coins+=g;save();hud();show(`<h2>Coins doubled</h2><p>+${g} bonus coins.</p><button class="btn" onclick="nextLevel()">Next level</button>`)});
 }
-function demoAd(cb){
-  let s=3;show(`<h2>Ad</h2><p id="adt">Reward in ${s}s (demo ad, replace with a real network)</p>`);
-  const t=setInterval(()=>{s--;if(s<=0){clearInterval(t);cb()}else $('#adt').textContent=`Reward in ${s}s (demo ad, replace with a real network)`},1000);
+function demoAd(){
+  show('<h2>Rewarded ads unavailable</h2><p>No verified ad provider is configured yet. No reward has been granted.</p><button class="btn" onclick="hide()">Continue</button>');
 }
 const totStars=()=>Object.values(S.stars).reduce((a,b)=>a+b,0);
 function menu(){
