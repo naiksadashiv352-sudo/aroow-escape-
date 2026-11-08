@@ -38,7 +38,12 @@ if (configured) {
               updatedAt: serverTimestamp()
             }, { merge: true });
           }
-          await window.ArrowFirebase?.restoreProgress?.();
+          const restored = await window.ArrowFirebase?.restoreProgress?.();
+          // First-time account linking uploads the guest save instead of leaving it stranded locally.
+          if (!restored && window.S) {
+            await saveProgress(window.S);
+            await publishScore(window.S);
+          }
         } catch (error) { console.warn("Firebase profile/progress sync:", error); }
       }
     });
