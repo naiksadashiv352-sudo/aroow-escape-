@@ -41,6 +41,49 @@ footer{display:flex;gap:10px;margin-top:16px}
 .sw{width:26px;height:26px;border-radius:8px;display:inline-block;vertical-align:middle;margin-right:8px}
 button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.a,.a.bump,.a.hint,.pop{animation:none;transition:none}}
+
+/* Final mobile-first layout: these rules live after the base styles so they win the cascade. */
+header{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) auto!important;
+ grid-template-areas:"brand menu" "level stats"!important;
+ align-items:center!important;
+ justify-content:stretch!important;
+ gap:7px 10px!important;
+ width:100%!important;
+ max-width:560px!important;
+ padding:8px 2px!important;
+ margin:0 auto!important;
+ font-size:13px!important;
+}
+header .brandbar{grid-area:brand!important;min-width:0!important;gap:7px!important}
+header #menu{grid-area:menu!important;justify-self:end!important;align-self:center!important;white-space:nowrap!important;padding:7px 12px!important;font-size:13px!important}
+header>span:nth-of-type(1){grid-area:level!important;justify-self:start!important;min-width:0!important;white-space:nowrap!important}
+header>span:nth-of-type(2){grid-area:stats!important;justify-self:end!important;white-space:nowrap!important}
+.brandmark{width:32px!important;height:32px!important;flex-basis:32px!important}
+.brandname{font-size:13px!important;white-space:nowrap!important}
+.brandname small{display:none!important}
+#firebase-account{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;
+ width:100%!important;max-width:560px!important;min-height:0!important;
+ margin:3px auto 8px!important;padding:7px 9px!important;gap:6px!important;
+ border-radius:12px!important;overflow:hidden!important;
+}
+#firebase-account-status{display:block!important;font-size:10px!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#firebase-account>span{display:flex!important;gap:6px!important;flex-wrap:wrap!important}
+#firebase-account button{font-size:10px!important;padding:5px 9px!important;line-height:1.2!important}
+#board{width:min(94vw,520px,calc(100svh - 340px))!important;max-width:520px!important;flex:0 0 auto!important}
+footer{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:center!important;gap:7px!important;margin:10px auto 12px!important}
+#pause-game{position:static!important;inset:auto!important;z-index:1!important;padding:11px 13px!important;font-size:13px!important;box-shadow:none!important}
+#platform-nav{position:fixed!important;display:flex!important;z-index:40!important;left:0!important;right:0!important;bottom:0!important}
+body{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))!important}
+@media(max-width:420px){
+ header{gap:6px 7px!important}
+ header>span{font-size:12px!important}
+ #board{width:min(94vw,calc(100svh - 320px))!important}
+ footer .btn{padding:10px 12px!important;font-size:13px!important}
+}
+
 </style>
 </head>
 <body>
