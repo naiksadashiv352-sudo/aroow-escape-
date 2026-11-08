@@ -67,10 +67,22 @@ async function restoreProgress() {
   if (!cloud || typeof cloud !== "object") return false;
   // Merge cloud progress over this browser's local save after successful sign-in.
   const local = JSON.parse(localStorage.getItem("arrowEscape") || "{}");
-  const merged = { ...local, ...cloud };
+  // Preserve guest progress when it is ahead of the cloud copy, and combine records.
+  const merged = {
+    ...cloud, ...local,
+    lvl: Math.max(1, Number(local.lvl) || 1, Number(cloud.lvl) || 1),
+    coins: Math.max(0, Number(local.coins) || 0, Number(cloud.coins) || 0),
+    hints: Math.max(0, Number(local.hints) || 0, Number(cloud.hints) || 0),
+    best: { ...(cloud.best || {}), ...(local.best || {}) },
+    stars: { ...(cloud.stars || {}), ...(local.stars || {}) },
+    daily: { ...(cloud.daily || {}), ...(local.daily || {}) },
+    own: [...new Set([...(cloud.own || [0]), ...(local.own || [0])])],
+    streak: Math.max(Number(local.streak) || 0, Number(cloud.streak) || 0)
+  };
   localStorage.setItem("arrowEscape", JSON.stringify(merged));
   if (window.S) Object.assign(window.S, merged);
   window.dispatchEvent(new CustomEvent("arrowescape:cloud-restored", { detail: merged }));
+  await saveProgress(merged).catch(error => console.warn("Merged cloud save:", error));
   await publishScore(merged).catch(error => console.warn("Leaderboard restore publish:", error));
   return true;
 }
