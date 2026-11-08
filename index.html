@@ -262,7 +262,7 @@ function pick(i){
   if(!S.own.includes(i)){S.coins-=SKINS[i].p;S.own.push(i)}
   S.skin=i;save();hud();skins();
 }
-/* Local leaderboard (this device only). For a global one, send scores to a backend such as Firebase. */
+/* Local records remain available on this device; world ranking uses Firebase when configured. */
 function mine(){
   const days=Object.entries(S.daily).sort((a,b)=>a[1]-b[1]).slice(0,7);
   show(`<h2>Leaderboard</h2><div class="row"><span>Highest level</span><b>${S.lvl}</b></div><div class="row"><span>Total stars</span><b>★ ${totStars()}</b></div>
@@ -299,6 +299,7 @@ $('#menu').onclick=menu;
 $('#hint').onclick=useHint;
 $('#restart').onclick=()=>start(mode);
 start('lvl');
+window.addEventListener('arrowescape:cloud-restored',()=>{hud();});
 /* Daily login gift with streak bonus */
 {const t=today(),y=new Date(Date.now()-864e5).toISOString().slice(0,10);
 if(S.last!==t){S.streak=S.last===y?S.streak+1:1;const b=Math.min(50,10*S.streak);S.coins+=b;S.last=t;save();hud();
