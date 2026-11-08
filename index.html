@@ -4,7 +4,8 @@
 <meta name="google-adsense-account" content="ca-pub-4432381486124869">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Arrow Escape</title>
+<title>ARROW ESCAPE — Puzzle Game</title>
+<link rel="stylesheet" href="./brand.css">
 <style>
 :root{--bg:#e6eee8;--ink:#14262b;--card:#fbfdf9;--ac:#14262b;--teal:#0f8b8d;--warn:#e4572e;--gold:#f2b134}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -84,7 +85,8 @@ if(ADS.client){
   window.adConfig({preloadAdBreaks:'on',sound:'on'});
 }
 let S=Object.assign({lvl:1,coins:0,hints:2,skin:0,own:[0],daily:{},best:{},stars:{},streak:0,last:'',snd:1,name:''},(()=>{try{return JSON.parse(localStorage.getItem('arrowEscape')||'{}')}catch(e){return{}}})());
-const save=()=>{try{localStorage.setItem('arrowEscape',JSON.stringify(S))}catch(e){}};
+window.S=S;
+const save=()=>{try{localStorage.setItem('arrowEscape',JSON.stringify(S));window.ArrowFirebase?.scheduleSave(S)}catch(e){}};
 const today=()=>new Date().toISOString().slice(0,10);
 const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))|0,7);
 function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -261,48 +263,50 @@ function pick(i){
   if(!S.own.includes(i)){S.coins-=SKINS[i].p;S.own.push(i)}
   S.skin=i;save();hud();skins();
 }
-/* Local leaderboard (this device only). For a global one, send scores to a backend such as Firebase. */
+/* Local records remain available on this device; world ranking uses Firebase when configured. */
 function mine(){
   const days=Object.entries(S.daily).sort((a,b)=>a[1]-b[1]).slice(0,7);
   show(`<h2>Leaderboard</h2><div class="row"><span>Highest level</span><b>${S.lvl}</b></div><div class="row"><span>Total stars</span><b>★ ${totStars()}</b></div>
   <p><b>Fastest daily clears</b></p>`+(days.length?days.map(([d,t])=>`<div class="row"><span>${d}</span><b>${fmt(t)}</b></div>`).join(''):'<p>Finish a daily challenge to set a time.</p>')+
   '<button class="btn alt" onclick="menu()">Back</button>');
 }
-/* ===== World leaderboard (shared db). Needs the page opened while signed in to Claude. ===== */
-let DB=null,UID=null;
+/* ===== Firebase-backed world leaderboard ===== */
 const esc=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const cleared=()=>Object.keys(S.best).length;
 const totTime=()=>Object.values(S.best).reduce((a,b)=>a+b,0);
 function sync(){
-  if(!DB||!UID||!cleared())return;
-  DB.collection('lb').doc(UID).set({cl:cleared(),t:totTime(),name:S.name||'Player',stars:totStars()}).catch(()=>{});
+  const fb=window.ArrowFirebase;
+  if(fb?.user){fb.publishScore(S).catch(e=>console.warn('Leaderboard sync failed:',e));}
 }
-(async()=>{try{
-  if(!window.claude||!claude.use)return;
-  const u=await claude.use('user');DB=await claude.use('db');
-  if(u&&DB){UID=await u.id();sync()}
-}catch(e){}})();
-function setName(){S.name=$('#nm').value.trim().slice(0,12);save();sync();board()}
+function setName(){
+  S.name=$('#nm').value.trim().slice(0,18);
+  save();
+  const fb=window.ArrowFirebase;
+  if(fb?.user)fb.setNickname(S.name).then(()=>sync()).catch(e=>alert(e.message));
+  board();
+}
 async function board(){
-  show(`<h2>World leaderboard</h2><p>Ranked by levels cleared, then by total time.</p><div id="wb"><p>Loading...</p></div>
-  <div class="row"><input id="nm" maxlength="12" placeholder="Your nickname" value="${esc(S.name)}" style="flex:1;min-width:0;font:inherit;padding:8px;border:2px solid var(--ink);border-radius:10px"><button class="btn" style="padding:8px 12px" onclick="setName()">Save</button></div>
+  show(`<h2>World leaderboard</h2><p>Ranked by levels cleared, then by total time. Sign in to submit your score.</p><div id="wb"><p>Loading...</p></div>
+  <div class="row"><input id="nm" maxlength="18" placeholder="Your nickname" value="${esc(S.name)}" style="flex:1;min-width:0;font:inherit;padding:8px;border:2px solid var(--ink);border-radius:10px"><button class="btn" style="padding:8px 12px" onclick="setName()">Save</button></div>
   <button class="btn alt" onclick="mine()">My records</button><button class="btn alt" onclick="menu()">Back</button>`);
-  const w=$('#wb');
-  if(!DB){w.innerHTML='<p>The world ranking is not available here. Open the game link while signed in to Claude to join it.</p>';return}
+  const w=$('#wb'), fb=window.ArrowFirebase;
+  if(!fb?.configured){w.innerHTML='<p>Firebase is not configured yet. Guest scores remain on this device. Follow FIREBASE_SETUP.md to enable the world leaderboard.</p>';return}
   try{
-    const sn=await DB.collection('lb').orderBy('cl','desc').limit(50).get();
-    const r=sn.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>b.cl-a.cl||a.t-b.t).slice(0,20);
-    w.innerHTML=r.length?'<div class="row"><b>#  Player</b><b>Level · Time</b></div>'+r.map((x,i)=>`<div class="row" style="${x.id===UID?'background:#f2b13433;border-radius:8px;padding:8px 6px':''}"><span>${i+1}. ${esc(x.name||'Player')}${x.id===UID?' (you)':''}</span><b>Lv ${esc(x.cl)} · ${fmt(+x.t||0)}</b></div>`).join(''):'<p>No scores yet. Clear a level to be the first!</p>';
-  }catch(e){w.innerHTML='<p>Could not load the ranking. Try again in a moment.</p>'}
+    const rows=await fb.getLeaderboard();
+    w.innerHTML=rows.length?'<div class="row"><b># · Player</b><b>Levels · Time</b></div>'+rows.map((x,i)=>`<div class="row" style="${fb.user&&x.id===fb.user.uid?'background:#f2b13433;border-radius:8px;padding:8px 6px':''}"><span>${i+1}. ${esc(x.displayName||'Player')}${fb.user&&x.id===fb.user.uid?' (you)':''}</span><b>${esc(x.levelsCleared)} · ${fmt(+x.totalTime||0)}</b></div>`).join(''):'<p>No scores yet. Sign in and clear a level to join.</p>';
+  }catch(e){w.innerHTML='<p>Could not load the world ranking. Check Firebase setup and Firestore rules.</p>'}
 }
 $('#menu').onclick=menu;
 $('#hint').onclick=useHint;
 $('#restart').onclick=()=>start(mode);
 start('lvl');
+window.addEventListener('arrowescape:cloud-restored',()=>{hud();});
 /* Daily login gift with streak bonus */
 {const t=today(),y=new Date(Date.now()-864e5).toISOString().slice(0,10);
 if(S.last!==t){S.streak=S.last===y?S.streak+1:1;const b=Math.min(50,10*S.streak);S.coins+=b;S.last=t;save();hud();
 show(`<h2>Daily gift</h2><p>🔥 Day ${S.streak} streak! +${b} coins. Come back tomorrow for more.</p><button class="btn" onclick="hide()">Play</button>`)}}
 </script>
+<script src="./platform.js"></script>
+<script type="module" src="./firebase.js"></script>
 </body>
 </html>
