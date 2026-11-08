@@ -5,7 +5,7 @@ const html = readFileSync("index.html", "utf8");
 const platform = readFileSync("platform.js", "utf8");
 const css = readFileSync("brand.css", "utf8");
 
-const inlineScripts = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)]
+const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1].trim())
   .filter(Boolean);
 
