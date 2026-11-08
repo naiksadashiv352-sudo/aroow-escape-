@@ -4,7 +4,8 @@
 <meta name="google-adsense-account" content="ca-pub-4432381486124869">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Arrow Escape</title>
+<title>ARROW ESCAPE — Puzzle Game</title>
+<link rel="stylesheet" href="./brand.css">
 <style>
 :root{--bg:#e6eee8;--ink:#14262b;--card:#fbfdf9;--ac:#14262b;--teal:#0f8b8d;--warn:#e4572e;--gold:#f2b134}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -305,6 +306,7 @@ window.addEventListener('arrowescape:cloud-restored',()=>{hud();});
 if(S.last!==t){S.streak=S.last===y?S.streak+1:1;const b=Math.min(50,10*S.streak);S.coins+=b;S.last=t;save();hud();
 show(`<h2>Daily gift</h2><p>🔥 Day ${S.streak} streak! +${b} coins. Come back tomorrow for more.</p><button class="btn" onclick="hide()">Play</button>`)}}
 </script>
+<script src="./platform.js"></script>
 <script type="module" src="./firebase.js"></script>
 </body>
 </html>
