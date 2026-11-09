@@ -108,11 +108,11 @@ async function publishScore(progress) {
 
 async function getLeaderboard() {
   if (!db) throw new Error("Firebase is not configured yet.");
-  const q = query(collection(db, "leaderboard"), orderBy("levelsCleared", "desc"), limit(50));
+  const q = query(collection(db, "leaderboard"), orderBy("levelsCleared", "desc"), limit(100));
   const snap = await getDocs(q);
   return snap.docs.map(item => ({ id: item.id, ...item.data() }))
     .sort((a, b) => (b.levelsCleared || 0) - (a.levelsCleared || 0) || (a.totalTime || 0) - (b.totalTime || 0))
-    .slice(0, 20);
+    .slice(0, 100);
 }
 
 async function signInGoogle() {
@@ -167,8 +167,8 @@ function mountAccountPanel() {
   if (document.getElementById("firebase-account")) return;
   const panel = document.createElement("section");
   panel.id = "firebase-account";
-  panel.style.cssText = "box-sizing:border-box;width:100%;max-width:560px;margin:2px auto 8px;padding:7px 9px;border:1px solid #b8c9bf;border-radius:12px;background:#fbfdf9;color:#14262b;font:11px system-ui;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;overflow:visible";
-  panel.innerHTML = '<span id="firebase-account-status">Offline progress · Firebase setup required</span><span style="display:flex;gap:6px;flex-wrap:wrap;min-width:0"><button id="firebase-google" type="button" style="border:0;border-radius:9px;padding:7px 10px;background:#14262b;color:white;font-weight:700">Google sign in</button><button id="firebase-email" type="button" style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b;font-weight:700">Email</button><button id="firebase-logout" type="button" hidden style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b">Log out</button></span>';
+  panel.style.cssText = "width:100%;max-width:560px;margin:0 auto 8px;padding:8px 10px;border:1px solid #b8c9bf;border-radius:14px;background:#fbfdf9;color:#14262b;font:13px system-ui;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap";
+  panel.innerHTML = '<span id="firebase-account-status">Offline progress · Firebase setup required</span><span style="display:flex;gap:6px"><button id="firebase-google" type="button" style="border:0;border-radius:9px;padding:7px 10px;background:#14262b;color:white;font-weight:700">Google sign in</button><button id="firebase-email" type="button" style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b;font-weight:700">Email</button><button id="firebase-logout" type="button" hidden style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b">Log out</button></span>';
   document.body.insertBefore(panel, document.getElementById("board"));
   const status = panel.querySelector("#firebase-account-status");
   const message = error => { status.textContent = error?.message || "Something went wrong."; };
