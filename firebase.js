@@ -108,11 +108,11 @@ async function publishScore(progress) {
 
 async function getLeaderboard() {
   if (!db) throw new Error("Firebase is not configured yet.");
-  const q = query(collection(db, "leaderboard"), orderBy("levelsCleared", "desc"), limit(50));
+  const q = query(collection(db, "leaderboard"), orderBy("levelsCleared", "desc"), limit(100));
   const snap = await getDocs(q);
   return snap.docs.map(item => ({ id: item.id, ...item.data() }))
     .sort((a, b) => (b.levelsCleared || 0) - (a.levelsCleared || 0) || (a.totalTime || 0) - (b.totalTime || 0))
-    .slice(0, 20);
+    .slice(0, 100);
 }
 
 async function signInGoogle() {
