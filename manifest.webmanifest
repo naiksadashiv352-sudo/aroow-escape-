@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "ARROW ESCAPE",
+  "short_name": "Arrow Escape",
+  "description": "A free arrow escape puzzle game. Clear paths, beat levels and improve your rank.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#e6eee8",
+  "theme_color": "#087f5b",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
