@@ -4,7 +4,13 @@
 <meta name="google-adsense-account" content="ca-pub-4432381486124869">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ARROW ESCAPE — Puzzle Game</title>
+<meta name="description" content="Play ARROW ESCAPE, a free and challenging arrow escape puzzle game. Clear paths, beat levels and improve your rank.">
+<meta name="theme-color" content="#087f5b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ARROW ESCAPE">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>ARROW ESCAPE — Free Puzzle Game</title>
 <link rel="stylesheet" href="./brand.css">
 <style>
 :root{--bg:#e6eee8;--ink:#14262b;--card:#fbfdf9;--ac:#14262b;--teal:#0f8b8d;--warn:#e4572e;--gold:#f2b134}
@@ -358,5 +364,13 @@ show(`<h2>Daily gift</h2><p>🔥 Day ${S.streak} streak! +${b} coins. Come back 
 </script>
 <script src="./platform.js"></script>
 <script type="module" src="./firebase.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" })
+      .catch(error => console.warn("ARROW ESCAPE offline setup unavailable:", error));
+  });
+}
+</script>
 </body>
 </html>
