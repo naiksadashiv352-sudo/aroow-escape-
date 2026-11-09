@@ -250,19 +250,17 @@ function win(){
   }
   S.coins+=gain;save();hud();sync();
   show(`<h2>${'★'.repeat(st)}${'☆'.repeat(3-st)}</h2><p><b>${finale?'All levels cleared':'Path clear'}</b><br>${msg}<br>Best combo x${maxc} · +${gain} coins${st<3?'<br>Clear with no mistakes for 3 stars.':''}</p>
-  ${gain>0?`<button class="btn gold" onclick="dbl(${gain})">Watch ad: double coins (+${gain})</button>`:''}
+
   <button class="btn" onclick="nextLevel()">${mode==='daily'?'Back to levels':'Next level'}</button><button class="btn alt" onclick="menu()">Menu</button>`);
 }
 function lose(){
   show(`<h2>Out of lives</h2><p>Every blocked tap costs a life. Look for arrows whose path to the edge is empty. Gray blocks never move.</p>
-  <button class="btn gold" onclick="ad(()=>{lives=1;over=false;hud();hide()})">Watch ad: continue with 1 life</button>
   <button class="btn" onclick="start('${mode}')">Retry</button><button class="btn alt" onclick="menu()">Menu</button>`);
 }
 function useHint(){
   if(over)return;
   if(S.hints<1){
     show(`<h2>No hints left</h2><p>A hint highlights an arrow you can safely tap.</p>
-    <button class="btn gold" onclick="ad(()=>{S.hints++;save();hud();hide()})">Watch ad: get 1 hint</button>
     <button class="btn" ${S.coins<HINT_PRICE?'disabled':''} onclick="S.coins-=${HINT_PRICE};S.hints++;save();hud();hide()">Buy for ${HINT_PRICE} coins</button>
     <button class="btn alt" onclick="hide()">Close</button>`);return;
   }
