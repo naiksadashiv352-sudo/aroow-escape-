@@ -255,6 +255,8 @@ function win(){
     finale=S.lvl>=MAXL;S.lvl=Math.min(MAXL,S.lvl+1);if(finale)msg='You cleared all 2,000 levels! Last time: '+fmt(secs)
   }
   S.coins+=gain;save();hud();sync();
+  const newAchievements=window.ArrowEscapeExtras?.checkAchievements?.()||[];
+  if(newAchievements.length){save();hud();}
   show(`<h2>${'★'.repeat(st)}${'☆'.repeat(3-st)}</h2><p><b>${finale?'All levels cleared':'Path clear'}</b><br>${msg}<br>Best combo x${maxc} · +${gain} coins${st<3?'<br>Clear with no mistakes for 3 stars.':''}</p>
 
   <button class="btn" onclick="nextLevel()">${mode==='daily'?'Back to levels':'Next level'}</button><button class="btn alt" onclick="menu()">Menu</button>`);
