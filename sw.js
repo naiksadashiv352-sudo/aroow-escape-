@@ -1,10 +1,11 @@
-const CACHE_NAME = "arrow-escape-shell-v1";
+const CACHE_NAME = "arrow-escape-shell-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./brand.css",
   "./platform.js",
   "./extras.js",
+  "./duel.js",
   "./firebase.js",
   "./firebase-config.js",
   "./manifest.webmanifest",
