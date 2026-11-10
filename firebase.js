@@ -2,10 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/fireba
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
   getRedirectResult, onAuthStateChanged, createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, signOut, updateProfile
+  signInWithEmailAndPassword, signInAnonymously, signOut, updateProfile
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs, getCountFromServer, serverTimestamp
+  getFirestore, doc, getDoc, setDoc, addDoc, collection, query, orderBy, limit, getDocs, getCountFromServer, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -14,6 +14,7 @@ const configured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("P
   && firebaseConfig.appId && !firebaseConfig.appId.startsWith("YOUR_");
 
 let auth = null, db = null, currentUser = null, saveTimer = null;
+let visitLoggedThisLoad = false;
 const listeners = new Set();
 const emit = () => listeners.forEach(fn => { try { fn(currentUser); } catch (e) { console.error(e); } });
 
@@ -25,6 +26,20 @@ if (configured) {
     onAuthStateChanged(auth, async user => {
       currentUser = user;
       emit();
+      if (!user) {
+        // Automatically create a Firebase anonymous account so guest visits can be counted.
+        signInAnonymously(auth).catch(error => console.warn("Guest visit tracking unavailable:", error));
+        return;
+      }
+      if (!visitLoggedThisLoad) {
+        visitLoggedThisLoad = true;
+        try {
+          await addDoc(collection(db, "gameVisits"), {
+            uid: user.uid,
+            createdAt: serverTimestamp()
+          });
+        } catch (error) { console.warn("Game visit tracking:", error); }
+      }
       if (user) {
         try {
           await setDoc(doc(db, "gamePlayers", user.uid), {
@@ -119,6 +134,12 @@ async function getPlayerCount() {
   return result.data().count;
 }
 
+async function getVisitCount() {
+  if (!db) throw new Error("Firebase is not configured yet.");
+  const result = await getCountFromServer(collection(db, "gameVisits"));
+  return result.data().count;
+}
+
 async function getLeaderboard() {
   if (!db) throw new Error("Firebase is not configured yet.");
   const q = query(collection(db, "leaderboard"), orderBy("levelsCleared", "desc"), limit(100));
@@ -170,7 +191,7 @@ window.ArrowFirebase = {
   configured, get user() { return currentUser; },
   onAuthChanged(fn) { listeners.add(fn); fn(currentUser); return () => listeners.delete(fn); },
   signInGoogle, signInEmail, signOut: () => auth ? signOut(auth) : Promise.reject(new Error("Firebase is not configured.")),
-  setNickname, saveProgress, restoreProgress, publishScore, getLeaderboard, getPlayerCount,
+  setNickname, saveProgress, restoreProgress, publishScore, getLeaderboard, getPlayerCount, getVisitCount,
   scheduleSave,
   status: () => !configured ? "Firebase setup required" : auth ? "Firebase ready" : "Firebase initialization error"
 };
