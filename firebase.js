@@ -202,7 +202,7 @@ function mountAccountPanel() {
   const panel = document.createElement("section");
   panel.id = "firebase-account";
   panel.style.cssText = "width:100%;max-width:560px;margin:0 auto 8px;padding:8px 10px;border:1px solid #b8c9bf;border-radius:14px;background:#fbfdf9;color:#14262b;font:13px system-ui;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap";
-  panel.innerHTML = '<span id="firebase-account-status">Offline progress · Firebase setup required</span><span style="display:flex;gap:6px"><button id="firebase-google" type="button" style="border:0;border-radius:9px;padding:7px 10px;background:#14262b;color:white;font-weight:700">Google sign in</button><button id="firebase-email" type="button" style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b;font-weight:700">Email</button><button id="firebase-logout" type="button" hidden style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b">Log out</button></span>';
+  panel.innerHTML = '<span id="firebase-account-status">Offline progress · Firebase setup required</span><span id="firebase-views" style="font-weight:700">Total game views: Loading…</span><span style="display:flex;gap:6px"><button id="firebase-google" type="button" style="border:0;border-radius:9px;padding:7px 10px;background:#14262b;color:white;font-weight:700">Google sign in</button><button id="firebase-email" type="button" style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b;font-weight:700">Email</button><button id="firebase-logout" type="button" hidden style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b">Log out</button></span>';
   document.body.insertBefore(panel, document.getElementById("board"));
   const status = panel.querySelector("#firebase-account-status");
   const message = error => { status.textContent = error?.message || "Something went wrong."; };
@@ -223,8 +223,20 @@ function mountAccountPanel() {
     panel.querySelector("#firebase-google").style.opacity = ".45";
     panel.querySelector("#firebase-email").style.opacity = ".45";
   }
+  const views = panel.querySelector("#firebase-views");
+  const refreshViews = async () => {
+    if (!configured) { views.textContent = "Total game views: Firebase setup needed"; return; }
+    try {
+      const count = await getVisitCount();
+      views.textContent = "Total game views: " + count.toLocaleString();
+    } catch (error) {
+      views.textContent = "Total game views: unavailable";
+      console.warn("Game view count unavailable:", error);
+    }
+  };
   window.ArrowFirebase.onAuthChanged(user => {
     status.textContent = user ? "Signed in · " + (user.displayName || user.email || "Player") + " · cloud save on" : (configured ? "Guest mode · progress saved on this device" : "Offline progress · add Firebase settings to enable accounts");
+    setTimeout(refreshViews, 1200);
     panel.querySelector("#firebase-google").hidden = !!user;
     panel.querySelector("#firebase-email").hidden = !!user;
     panel.querySelector("#firebase-logout").hidden = !user;
