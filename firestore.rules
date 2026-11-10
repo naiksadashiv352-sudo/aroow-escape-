@@ -24,6 +24,18 @@ service cloud.firestore {
       allow delete: if isOwner(uid);
     }
 
+    // Public count of unique signed-in player accounts.
+    match /gamePlayers/{uid} {
+      allow read: if true;
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['displayName', 'createdAt', 'lastSeen'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() <= 18
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.lastSeen is timestamp;
+      allow delete: if isOwner(uid);
+    }
+
     match /leaderboard/{uid} {
       allow read: if true;
       allow create, update: if isOwner(uid)
