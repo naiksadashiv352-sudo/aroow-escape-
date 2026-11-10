@@ -4,6 +4,7 @@ const CORE_ASSETS = [
   "./index.html",
   "./brand.css",
   "./platform.js",
+  "./extras.js",
   "./firebase.js",
   "./firebase-config.js",
   "./manifest.webmanifest",
