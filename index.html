@@ -34,6 +34,26 @@ button{font:inherit;cursor:pointer}
 .v{background:#c9d6cd;opacity:.6}
 .rk{background:#6b7b73;border:3px solid #46564f}
 .pop{position:absolute;font-weight:800;font-size:20px;color:var(--warn);pointer-events:none;animation:fl .8s forwards;text-shadow:0 1px #fff}
+#board{isolation:isolate;transition:background .45s,border-color .45s}
+#board .a svg{filter:drop-shadow(0 2px 1px rgba(0,0,0,.18))}
+#board .v{background:linear-gradient(145deg,rgba(255,255,255,.72),rgba(110,130,120,.28));border:1px solid rgba(40,60,50,.12)}
+#board[data-map="1"]{background-color:#e8e5ff;background-image:radial-gradient(circle,#a99bd7 1.5px,transparent 2px)}
+#board[data-map="2"]{background-color:#dff5ef;background-image:radial-gradient(circle,#8dc8b8 1.5px,transparent 2px)}
+#board[data-map="3"]{background-color:#fff0d9;background-image:radial-gradient(circle,#dfb77e 1.5px,transparent 2px)}
+#board[data-map="4"]{background-color:#e8f0ff;background-image:radial-gradient(circle,#9db8e5 1.5px,transparent 2px)}
+#board[data-map="5"]{background-color:#e2f6f4;background-image:radial-gradient(circle,#8bc9c3 1.5px,transparent 2px)}
+#board[data-map="6"]{background-color:#f8e5ed;background-image:radial-gradient(circle,#d4a0b7 1.5px,transparent 2px)}
+#board[data-map="7"]{background-color:#e6f0d9;background-image:radial-gradient(circle,#a9c58b 1.5px,transparent 2px)}
+#board[data-map="8"]{background-color:#e1efff;background-image:radial-gradient(circle,#91b6dd 1.5px,transparent 2px)}
+#board[data-map="9"]{background-color:#f5ead6;background-image:radial-gradient(circle,#cbb58b 1.5px,transparent 2px)}
+#board[data-map="10"]{background-color:#e5e9ff;background-image:radial-gradient(circle,#a5aee0 1.5px,transparent 2px)}
+#board[data-map="11"]{background-color:#e4f5e8;background-image:radial-gradient(circle,#9ac8a5 1.5px,transparent 2px)}
+#board[data-map="12"]{background-color:#f2e8ff;background-image:radial-gradient(circle,#bea0df 1.5px,transparent 2px)}
+.clear-trail{position:absolute;z-index:3;height:5px;margin-top:0;transform-origin:left center;background:linear-gradient(90deg,var(--teal),#fff);border-radius:99px;pointer-events:none;animation:trailOut .48s ease-out forwards;box-shadow:0 0 12px var(--teal)}
+.clear-spark{position:absolute;z-index:4;width:18px;height:18px;margin:-9px;border:3px solid #fff;border-radius:50%;background:var(--gold);pointer-events:none;animation:sparkOut .48s ease-out forwards;box-shadow:0 0 16px var(--gold)}
+@keyframes trailOut{0%{opacity:.95;scale:.15 1}70%{opacity:.9}100%{opacity:0;scale:1 1}}
+@keyframes sparkOut{to{opacity:0;scale:2.8}}
+
 @keyframes fl{to{translate:0 -46px;opacity:0}}
 @keyframes bump{25%{translate:-6px 0;color:var(--warn)}75%{translate:6px 0;color:var(--warn)}}
 @keyframes pulse{50%{scale:1.3}}
@@ -121,13 +141,21 @@ const DIR=[[0,-1],[1,0],[0,1],[-1,0]];
 const MAXL=2000;
 const SKINS=[{n:'Ink',c:'#14262b',p:0},{n:'Lagoon',c:'#0f8b8d',p:100},{n:'Mango',c:'#f2a000',p:200},{n:'Berry',c:'#9b2c6a',p:300},{n:'Cobalt',c:'#2748d8',p:400},{n:'Ruby',c:'#c0182f',p:600},{n:'Aurora',c:'#7a3cff',p:800}];
 /* Maps: a function that returns 1 for a "void" cell (no arrows there). */
-const MAPS=[['Classic',()=>0],
-['Diamond',(x,y,n)=>Math.abs(x-(n-1)/2)+Math.abs(y-(n-1)/2)>n*.7],
-['Ring',(x,y,n)=>Math.max(Math.abs(x-(n-1)/2),Math.abs(y-(n-1)/2))<n*.17],
-['Cross',(x,y,n)=>{const c=(n-1)/2,k=n*.2;return Math.abs(x-c)>k&&Math.abs(y-c)>k}],
-['Checker',(x,y)=>x%3==1&&y%3==1],
-['Circle',(x,y,n)=>Math.hypot(x-(n-1)/2,y-(n-1)/2)>n*.52],
-['Hourglass',(x,y,n)=>{const c=(n-1)/2;return Math.abs(x-c)>Math.abs(y-c)*1.4+1}]];
+const MAPS=[
+ ['Classic',()=>0],
+ ['Diamond',(x,y,n)=>Math.abs(x-(n-1)/2)+Math.abs(y-(n-1)/2)>n*.7],
+ ['Ring',(x,y,n)=>Math.max(Math.abs(x-(n-1)/2),Math.abs(y-(n-1)/2))<n*.17],
+ ['Cross',(x,y,n)=>{const c=(n-1)/2,k=n*.2;return Math.abs(x-c)>k&&Math.abs(y-c)>k}],
+ ['Checker',(x,y)=>x%3==1&&y%3==1],
+ ['Circle',(x,y,n)=>Math.hypot(x-(n-1)/2,y-(n-1)/2)>n*.52],
+ ['Hourglass',(x,y,n)=>{const c=(n-1)/2;return Math.abs(x-c)>Math.abs(y-c)*1.4+1}],
+ ['Zigzag',(x,y,n)=>y%2===1&&(x%4===1||x%4===2)],
+ ['Twin Islands',(x,y,n)=>{const c=(n-1)/2;return Math.abs(x-c)<.6&&Math.abs(y-c)>1}],
+ ['Fortress',(x,y,n)=>(x===0||x===n-1)&&(y===0||y===n-1)],
+ ['Wave',(x,y,n)=>(y===Math.floor(n/3)&&x%2===0)||(y===Math.floor(2*n/3)&&x%2===1)],
+ ['Bridge',(x,y,n)=>(x===0||x===n-1)&&y>0&&y<n-1],
+ ['Maze',(x,y,n)=>x%3===1&&y%2===1]
+];
 const HINT_PRICE=30;
 /* ===== ADS: put your AdSense publisher ID in client (leave '' for demo ads) =====
    test:true = Google test ads. every = full-screen ad after every Nth level (only after level 20). */
@@ -207,7 +235,7 @@ function start(m){
   mode=m;over=false;
   const lvl=m==='daily'?40+Math.abs(hash(today()))%160:S.lvl, seed=m==='daily'?hash(today()):lvl*7919+13;
   G=gen(seed,lvl);lives=3;el=0;lastT=Date.now();live=new Map();combo=maxc=0;
-  const bd=$('#board');bd.innerHTML='';bd.style.setProperty('--n',G.n);
+  const bd=$('#board');bd.innerHTML='';bd.style.setProperty('--n',G.n);bd.dataset.map=String(G.mi);
   const pos=(b,x,y)=>b.style.cssText=`left:${x*100/G.n}%;top:${y*100/G.n}%;width:${100/G.n}%;height:${100/G.n}%`;
   const tile=(c,k)=>{const [x,y]=k.split(',').map(Number),d=document.createElement('div');d.className=c;pos(d,x,y);bd.appendChild(d)};
   G.voids.forEach(k=>tile('v',k));G.W.forEach(k=>tile('rk',k));
@@ -235,6 +263,8 @@ function tap(a){
   if(combo>=3)pop(a,'x'+combo);
   const [dx,dy]=DIR[a.d],n=G.n;
   const dist=a.d===0?a.y+1:a.d===2?n-a.y:a.d===3?a.x+1:n-a.x;
+  const trail=document.createElement('i');trail.className='clear-trail';trail.style.left=((a.x+.5)*100/n)+'%';trail.style.top=((a.y+.5)*100/n)+'%';trail.style.width=(dist*100/n)+'%';trail.style.transform='translateY(-50%) rotate('+([ -90,0,90,180 ][a.d])+'deg)';$('#board').appendChild(trail);setTimeout(()=>trail.remove(),520);
+  const flash=document.createElement('i');flash.className='clear-spark';flash.style.left=((a.x+.5)*100/n)+'%';flash.style.top=((a.y+.5)*100/n)+'%';$('#board').appendChild(flash);setTimeout(()=>flash.remove(),520);
   a.el.classList.add('out');
   a.el.style.transform=`translate(${dx*dist*100}%,${dy*dist*100}%)`;
   setTimeout(()=>a.el.remove(),400);
