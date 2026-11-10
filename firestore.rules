@@ -24,7 +24,17 @@ service cloud.firestore {
       allow delete: if isOwner(uid);
     }
 
-    // Public count of unique signed-in player accounts.
+    // Every app opening is logged, including guests using Firebase anonymous auth.
+    match /gameVisits/{visitId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt is timestamp;
+      allow update, delete: if false;
+    }
+
+    // Public count of signed-in player accounts (including anonymous guest accounts).
     match /gamePlayers/{uid} {
       allow read: if true;
       allow create, update: if isOwner(uid)
