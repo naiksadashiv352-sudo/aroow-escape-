@@ -1,11 +1,12 @@
-// Copy your Firebase web app settings from Firebase Console > Project settings.
-// Keep this file free of service-account credentials and private keys.
-// The Firebase web config is designed for client apps; protect data with Firestore Rules.
+// Firebase web app configuration for ARROW ESCAPE.
+// This client-side config is public by design; protect data with Firebase Security Rules.
+// Never add service-account credentials or private keys to this file.
 export const firebaseConfig = {
-  apiKey: "PASTE_FIREBASE_WEB_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_FIREBASE_APP_ID"
+  apiKey: "AIzaSyBq8hjSttvB2k3P3Njj3ZcEMFrXScqXd0s",
+  authDomain: "arrow-escape-256ae.firebaseapp.com",
+  projectId: "arrow-escape-256ae",
+  storageBucket: "arrow-escape-256ae.firebasestorage.app",
+  messagingSenderId: "791488685461",
+  appId: "1:791488685461:web:3236b1e9078430f9cdc29c",
+  measurementId: "G-WF9QSY1H6N"
 };
