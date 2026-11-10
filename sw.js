@@ -1,4 +1,4 @@
-const CACHE_NAME = "arrow-escape-shell-v3";
+const CACHE_NAME = "arrow-escape-shell-v4";
 const CORE_ASSETS = [
   "./",
   "./index.html",
