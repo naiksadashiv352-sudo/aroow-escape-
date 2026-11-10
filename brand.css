@@ -27,7 +27,7 @@ body[data-theme=dark] #tm{background:#087f5b!important}
 .brandname{font-weight:900;letter-spacing:-.8px;font-size:16px;line-height:1}
 .brandname small{display:block;font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:4px}
 #platform-nav{position:fixed;z-index:20;left:0;right:0;bottom:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--panel) 94%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(16px);display:flex;justify-content:center}
-#platform-nav .navinner{width:100%;max-width:560px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+#platform-nav .navinner{width:100%;max-width:560px;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
 .navitem{border:0;background:transparent;color:var(--muted);border-radius:12px;padding:7px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:750}
 .navitem span{font-size:19px;line-height:1.1}
 .navitem.active{background:var(--soft);color:var(--brand)}
