@@ -5,7 +5,7 @@ import {
   signInWithEmailAndPassword, signOut, updateProfile
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs, serverTimestamp
+  getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs, getCountFromServer, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -26,6 +26,13 @@ if (configured) {
       currentUser = user;
       emit();
       if (user) {
+        try {
+          await setDoc(doc(db, "gamePlayers", user.uid), {
+            displayName: (user.displayName || "Player").slice(0, 18),
+            createdAt: serverTimestamp(),
+            lastSeen: serverTimestamp()
+          }, { merge: true });
+        } catch (error) { console.warn("Player count registration:", error); }
         try {
           const ref = doc(db, "users", user.uid);
           const snap = await getDoc(ref);
@@ -106,6 +113,12 @@ async function publishScore(progress) {
   }, { merge: true });
 }
 
+async function getPlayerCount() {
+  if (!db) throw new Error("Firebase is not configured yet.");
+  const result = await getCountFromServer(collection(db, "gamePlayers"));
+  return result.data().count;
+}
+
 async function getLeaderboard() {
   if (!db) throw new Error("Firebase is not configured yet.");
   const q = query(collection(db, "leaderboard"), orderBy("levelsCleared", "desc"), limit(100));
@@ -157,7 +170,7 @@ window.ArrowFirebase = {
   configured, get user() { return currentUser; },
   onAuthChanged(fn) { listeners.add(fn); fn(currentUser); return () => listeners.delete(fn); },
   signInGoogle, signInEmail, signOut: () => auth ? signOut(auth) : Promise.reject(new Error("Firebase is not configured.")),
-  setNickname, saveProgress, restoreProgress, publishScore, getLeaderboard,
+  setNickname, saveProgress, restoreProgress, publishScore, getLeaderboard, getPlayerCount,
   scheduleSave,
   status: () => !configured ? "Firebase setup required" : auth ? "Firebase ready" : "Firebase initialization error"
 };
