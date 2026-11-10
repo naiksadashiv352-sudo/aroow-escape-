@@ -1,6 +1,6 @@
 # ARROW ESCAPE — Firebase setup
 
-The game remains playable as a guest. Its existing localStorage save is retained. Firebase adds Google/email authentication, per-user cloud progress, and a shared leaderboard once configured.
+The game remains playable as a guest. Its existing localStorage save is retained. Firebase adds Google/email authentication, per-user cloud progress, a shared leaderboard, and a registered-player count once configured.
 
 ## 1. Create a Firebase project
 
@@ -15,7 +15,7 @@ The Firebase web configuration is not a service-account secret. Never put a serv
 
 ## 2. Publish Firestore rules
 
-In Firebase Console → Firestore Database → Rules, paste the contents of `firestore.rules` and publish. The rules restrict private user documents to their owner and allow public read-only leaderboard access.
+In Firebase Console → Firestore Database → Rules, paste the latest contents of `firestore.rules` and publish. The rules restrict private user documents to their owner, allow public read-only leaderboard access, and allow each signed-in account to maintain one public `gamePlayers/{uid}` directory entry.
 
 ## 3. Test
 
@@ -23,12 +23,14 @@ In Firebase Console → Firestore Database → Rules, paste the contents of `fir
 2. Open the game and use **Google sign in** or **Email**.
 3. Complete a level, refresh, and sign in again to check cloud progress.
 4. Open Leaderboard from the game menu and verify the account's score appears.
+5. Return to Home and tap **Community player count**. The count includes unique signed-in accounts that have opened the game; guest visitors are not included. It is not a count of every page view or play session.
 
 ## Current implementation boundary
 
 - Guest play and local saves continue to work without Firebase configuration.
 - Google and email/password authentication are implemented in the client.
-- Signed-in progress is written to `users/{uid}`; public ranking entries are written to `leaderboard/{uid}`.
+- Signed-in progress is written to `users/{uid}`; public ranking entries are written to `leaderboard/{uid}`; one player directory entry is written to `gamePlayers/{uid}` for the community count.
+- The community count is unique signed-in accounts, not total guest visitors, total launches, or concurrent players. It requires Firebase configuration and the latest Firestore rules.
 - This client-side leaderboard is suitable for an initial prototype, not a cheat-resistant competitive ranking. Players can manipulate browser state. Before cash prizes, tournaments, paid currency, or trusted rankings, move score validation and reward grants to trusted Cloud Functions / a server and use App Check.
 - Payment processing, AdMob/AdSense reward verification, admin roles, and server-authoritative purchases are not enabled by this Firebase foundation.
 - Do not grant currency or premium items based only on a client-side success callback.
