@@ -235,11 +235,16 @@ function mountAccountPanel() {
     }
   };
   window.ArrowFirebase.onAuthChanged(user => {
-    status.textContent = user ? "Signed in · " + (user.displayName || user.email || "Player") + " · cloud save on" : (configured ? "Guest mode · progress saved on this device" : "Offline progress · add Firebase settings to enable accounts");
+    const isRegistered = !!user && !user.isAnonymous;
+    status.textContent = isRegistered
+      ? "Signed in · " + (user.displayName || user.email || "Player") + " · cloud save on"
+      : (configured ? "Guest mode · sign in to back up progress" : "Offline progress · add Firebase settings to enable accounts");
     setTimeout(refreshViews, 1200);
-    panel.querySelector("#firebase-google").hidden = !!user;
-    panel.querySelector("#firebase-email").hidden = !!user;
-    panel.querySelector("#firebase-logout").hidden = !user;
+    // Anonymous Firebase sessions are guests, not registered accounts.
+    // Keep sign-in/create-account actions visible so new players can upgrade.
+    panel.querySelector("#firebase-google").hidden = isRegistered;
+    panel.querySelector("#firebase-email").hidden = isRegistered;
+    panel.querySelector("#firebase-logout").hidden = !isRegistered;
   });
 }
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountAccountPanel);
