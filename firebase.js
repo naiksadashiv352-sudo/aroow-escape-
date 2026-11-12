@@ -201,12 +201,24 @@ function mountAccountPanel() {
   if (document.getElementById("firebase-account")) return;
   const panel = document.createElement("section");
   panel.id = "firebase-account";
-  panel.style.cssText = "width:100%;max-width:560px;margin:0 auto 8px;padding:8px 10px;border:1px solid #b8c9bf;border-radius:14px;background:#fbfdf9;color:#14262b;font:13px system-ui;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap";
-  panel.innerHTML = '<span id="firebase-account-status">Offline progress · Firebase setup required</span><span id="firebase-views" style="font-weight:700">Total game views: Loading…</span><span style="display:flex;gap:6px"><button id="firebase-google" type="button" style="border:0;border-radius:9px;padding:7px 10px;background:#14262b;color:white;font-weight:700">Google sign in</button><button id="firebase-email" type="button" style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b;font-weight:700">Email</button><button id="firebase-logout" type="button" hidden style="border:1px solid #14262b;border-radius:9px;padding:7px 10px;background:white;color:#14262b">Log out</button></span>';
-  document.body.insertBefore(panel, document.getElementById("board"));
+  panel.style.cssText = "box-sizing:border-box;width:calc(100% - 24px);max-width:560px;margin:8px auto 12px;padding:12px;border:1px solid #b8c9bf;border-radius:14px;background:#fbfdf9;color:#14262b;font:14px system-ui;display:flex;flex-direction:column;align-items:stretch;gap:8px;position:relative;z-index:2;overflow:visible";
+  panel.innerHTML = '<div id="firebase-account-status" style="font-weight:650;line-height:1.35;overflow-wrap:anywhere">Guest mode · sign in to back up progress</div><div id="firebase-views" style="font-weight:750">Total game views: Loading…</div><div id="firebase-account-error" role="status" aria-live="polite" style="font-size:12px;color:#a12626;overflow-wrap:anywhere"></div><div id="firebase-account-actions" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><button id="firebase-google" type="button" style="border:0;border-radius:9px;padding:9px 12px;background:#14262b;color:white;font-weight:700">Continue with Google</button><button id="firebase-email" type="button" style="border:1px solid #14262b;border-radius:9px;padding:9px 12px;background:white;color:#14262b;font-weight:700">Email sign in / sign up</button><button id="firebase-logout" type="button" hidden style="border:1px solid #14262b;border-radius:9px;padding:9px 12px;background:white;color:#14262b;font-weight:700">Log out</button></div>';
+  const board = document.getElementById("board");
+  if (board?.parentNode) board.parentNode.insertBefore(panel, board);
+  else document.body.appendChild(panel);
   const status = panel.querySelector("#firebase-account-status");
-  const message = error => { status.textContent = error?.message || "Something went wrong."; };
-  panel.querySelector("#firebase-google").onclick = () => signInGoogle().catch(message);
+  const errorBox = panel.querySelector("#firebase-account-error");
+  const message = error => {
+    errorBox.textContent = error?.message || "Sign-in failed. Please try again.";
+    console.error("ARROW ESCAPE sign-in:", error);
+  };
+  panel.querySelector("#firebase-google").onclick = async () => {
+    errorBox.textContent = "";
+    panel.querySelector("#firebase-google").disabled = true;
+    try { await signInGoogle(); }
+    catch (error) { message(error); }
+    finally { panel.querySelector("#firebase-google").disabled = false; }
+  };
   panel.querySelector("#firebase-email").onclick = async () => {
     const email = prompt("Enter your email address");
     if (!email) return;
@@ -235,7 +247,7 @@ function mountAccountPanel() {
     }
   };
   window.ArrowFirebase.onAuthChanged(user => {
-    const isRegistered = !!user && !user.isAnonymous;
+    const isRegistered = !!user && !user.isAnonymous && (user.providerData || []).length > 0;
     status.textContent = isRegistered
       ? "Signed in · " + (user.displayName || user.email || "Player") + " · cloud save on"
       : (configured ? "Guest mode · sign in to back up progress" : "Offline progress · add Firebase settings to enable accounts");
@@ -245,6 +257,7 @@ function mountAccountPanel() {
     panel.querySelector("#firebase-google").hidden = isRegistered;
     panel.querySelector("#firebase-email").hidden = isRegistered;
     panel.querySelector("#firebase-logout").hidden = !isRegistered;
+    if (!isRegistered) errorBox.textContent = "";
   });
 }
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountAccountPanel);
