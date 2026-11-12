@@ -1,0 +1,23 @@
+# Local development and build output
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+build/
+.cache/
+
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+firebase-adminsdk*.json
+*-service-account*.json
+
+# Local editor files
+.vscode/
+.idea/
