@@ -152,9 +152,16 @@ async function getLeaderboard() {
 async function signInGoogle() {
   if (!auth) throw new Error("Add your Firebase web configuration first.");
   const provider = new GoogleAuthProvider();
+  // iOS browsers/web views often block or fail popup auth; redirect is more reliable.
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (isIOS) {
+    await signInWithRedirect(auth, provider);
+    return;
+  }
   try { await signInWithPopup(auth, provider); }
   catch (error) {
-    if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment"].includes(error.code)) {
+    if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/cancelled-popup-request"].includes(error.code)) {
       await signInWithRedirect(auth, provider);
       return;
     }
